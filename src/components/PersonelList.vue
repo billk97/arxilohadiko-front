@@ -1,28 +1,19 @@
 <template>
     <div>
         <h1>Personel</h1>
-        <v-list lines="three">
-            <v-list-item
-                v-for="(person, i) in persons"
-                :key= "i"
-            >
-                <template v-slot:prepend>
-                    <v-avatar color="grey-lighten-1">
-                        <v-icon color="white" icon="mdi-account"></v-icon>
-                    </v-avatar>
-                    ΑΣΜ: {{person.milId}}
-                    {{person.lastName}}
-                    {{person.firstName}}
-                    
-                    {{person.mobileNumber}}
-                </template>
-                <template v-slot:append>
-                <v-btn prepend-icon="mdi-information" color="blue" @click="editProfile(person)">
-                    ΕΠΕΞΕΡΓΑΣΙΑ
-                </v-btn>
-                </template>
-            </v-list-item>
-        </v-list>
+        <div class="container">
+            <v-btn
+                prepend-icon="mdi-account-plus"
+                color="success"
+                @click="goToAddNewPerson"
+            >Προσθήκη</v-btn>
+        </div>
+        <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
+            :headers="headers"
+            :items="persons"
+            :loading="loading"
+        />
     </div>
 </template>
 
@@ -31,18 +22,37 @@
     export default {
         name: 'PersonelList',
         data: () => ({
-            persons: []
+            persons: [],
+            headers: [
+                {title: 'ΕΠΩΝΥΜΟ', key: 'lastName', align: 'end'},
+                {title: 'ΟΝΟΜΑ', key: 'firstName', align: 'end'},
+                {title: 'ΑΜ', key: 'milId', align: 'end'},
+                {title: 'ΤΗΛ', key: 'mobileNumber', align: 'end'}
+            ],
+            itemsPerPage: 40,
+            loading: true,
         }),
         mounted() {
             personel.getAllActivePersonel().then(r => {
                 this. persons = r.data
+                this.loading = false
             })
         },
         methods: {
             editProfile(person) {
                 console.log('click')
                 this.$router.push(`/personel/${person.id}`)
+            },
+            goToAddNewPerson() {
+                this.$router.push(`/personel/add`)
             }
         }
     }
 </script>
+
+<style scoped>
+    .container {
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>
